@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMove : MonoBehaviour
 {
 
@@ -11,7 +12,7 @@ public class PlayerMove : MonoBehaviour
   private Rigidbody2D rb;
   public Animator animator;
 
-   void Start()
+   void Awake()
   {
     rb = GetComponent<Rigidbody2D>();
   }

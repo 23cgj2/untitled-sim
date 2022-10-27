@@ -17,6 +17,7 @@ public class CharacterInteractControl : MonoBehaviour
     [SerializeField] MarkerManager markerManager;
     [SerializeField] TileMapController tileMapController;
     [SerializeField] float maxDistance = 2.5f;
+    [SerializeField] ToolAction onTilePickUp;
 
     Vector3Int selectedTilePosition;
     bool selectable;
@@ -39,7 +40,7 @@ public class CharacterInteractControl : MonoBehaviour
 
       Check();
 
-      if(Input.GetKeyDown("h"))
+      if(Input.GetMouseButtonDown(0))
       {
         if(Interact() == true)
         {
@@ -92,10 +93,19 @@ public class CharacterInteractControl : MonoBehaviour
       Vector2 position = rgbd.position + characterControl.lastMoveDirection * offsetDistance;
 
       Item item = toolbarController.GetItem;
+
       if(item == null) { return false; }
       if(item.onAction == null) { return false; }
 
       bool complete = item.onAction.OnApply(position);
+
+      if(complete == true)
+        {
+          if(item.onItemUsed != null) 
+          {
+            item.onItemUsed.OnItemUsed(item, GameManager.instance.inventoryContainer);
+          }
+        } 
 
       return complete;
 
@@ -105,21 +115,31 @@ public class CharacterInteractControl : MonoBehaviour
     {
       if(selectable == true)
       {
-        TileBase tileBase = tileMapController.GetTileBase(selectedTilePosition);
-        TileData tileData = tileMapController.GetTileData(tileBase);
-        if(tileData != plowableTiles)
-        {
-          return;
+        Item item = toolbarController.GetItem;
+        if (item == null) 
+        { 
+          PickUpTile();
+          return; 
         }
+        if (item.onTileMapAction == null) { return; }
 
+        // animator.SetTrigger("act");
+        bool complete = item.onTileMapAction.OnApplyToTileMap(selectedTilePosition, tileMapController, item);
 
-        if(cropsManager.Check(selectedTilePosition))
+        if(complete == true)
         {
-          cropsManager.Seed(selectedTilePosition);
-
-        } else {
-          cropsManager.Plow(selectedTilePosition);
-        }
+          if(item.onItemUsed != null) 
+          {
+            item.onItemUsed.OnItemUsed(item, GameManager.instance.inventoryContainer);
+          }
+        } 
       }
+    }
+
+    private void PickUpTile()
+    {
+      if (onTilePickUp == null) { return; }
+
+      onTilePickUp.OnApplyToTileMap(selectedTilePosition, tileMapController, null);
     }
 }

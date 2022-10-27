@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class InventoryEntry : MonoBehaviour
+public class InventoryEntry : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] Image icon;
     [SerializeField] Text text;
+    [SerializeField] Image highlight;
 
     int myIndex;
 
@@ -35,5 +37,18 @@ public class InventoryEntry : MonoBehaviour
       icon.gameObject.SetActive(false);
 
       text.gameObject.SetActive(false);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+      ItemPanel itemPanel = transform.parent.GetComponent<ItemPanel>();
+      itemPanel.OnClick(myIndex);
+      // transform.parent.GetComponent<InventoryLog>().Show();
+  
+    }
+
+    public void Highlight(bool b)
+    {
+      highlight.gameObject.SetActive(b);
     }
 }

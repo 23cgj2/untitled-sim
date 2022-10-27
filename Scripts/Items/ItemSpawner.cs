@@ -27,7 +27,7 @@ public class ItemSpawner : MonoBehaviour
         position.x += spread * UnityEngine.Random.value - spread / 2;
         position.y += spread * UnityEngine.Random.value - spread / 2;
 
-        //ItemSpawnManager.instance.SpawnItem(position, toSpawn, count);
+        ItemSpawnManager.instance.SpawnItem(position, toSpawn, count);
       }
 
     }

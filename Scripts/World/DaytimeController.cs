@@ -8,6 +8,7 @@ public class DaytimeController : MonoBehaviour
 {
     const float secondsInDay = 81000f;
     const float phaseLength = 900f;
+    const float phasesInDay = 90;
 
     [SerializeField] Color nightLightColor;
     [SerializeField] AnimationCurve nightTimeCurve;
@@ -53,7 +54,6 @@ public class DaytimeController : MonoBehaviour
     private void Update()
     {
       time += Time.deltaTime * timeScale;
-
       TimeValueCalculation();
       DayLight();
 
@@ -61,14 +61,23 @@ public class DaytimeController : MonoBehaviour
       {
         marker = "PM";
       }
-
       if(time > secondsInDay)
       {
         marker = "AM";
         NextDay();
       }
-
+      
       TimeAgents();
+
+      if(Input.GetKeyDown(KeyCode.T))
+      {
+        SkipTime(hours: 4);
+      }
+    }
+
+    private int CalculatePhase()
+    {
+      return (int)(time / phaseLength) + (int)(days * phasesInDay);
     }
 
     private void NextDay()
@@ -92,21 +101,36 @@ public class DaytimeController : MonoBehaviour
       globalLight.color = c;
     }
 
-    int oldPhase = 0;
+    int oldPhase = -1;
 
     private void TimeAgents()
     {
-      int currentPhase = (int)(time / phaseLength);
-
-      if(oldPhase != currentPhase)
+      if(oldPhase == -1)
       {
-        oldPhase = currentPhase;
+        oldPhase = CalculatePhase();
+      }
+
+      int currentPhase = CalculatePhase();
+
+      while (oldPhase < currentPhase)
+      {
+        oldPhase += 1;
         for(int i = 0; i < agents.Count; i++)
         {
           agents[i].Invoke();
         }
       }
 
+    }
+
+    public void SkipTime(float seconds = 0, float minute = 0, float hours = 0)
+    {
+      // float timeToSkip = seconds;
+      // timeToSkip += minute * 60f;
+      // timeToSkip += hours * 3600f;
+
+      // time += timeToSkip;
+      NextDay();
     }
 
 }
